@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import axios from "axios";
+import { useEffect } from "react";
+import { useState } from "react";
+import "./app.css";
+import CardList from "./components/card-list/card-list";
+import SearchBox from "./components/search-box/search-box";
 
 function App() {
+  console.log("start")
+  const [filter, setFilter] = useState("");
+  const [search, setSearch] = useState([]);
+
+  useEffect(() => {
+    console.log("useEffect")
+    const getMonsters = async () => {
+      try {
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+        setSearch(response.data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    getMonsters();
+  }, []);
+
+  const onSearchChange = (e) => {
+    const searchField = e.target.value.toLocaleLowerCase();
+    setFilter(() => {
+      return searchField;
+    });
+  }
+
+  const filteredMonsters = search.filter((monster) => {
+    return monster.name.toLocaleLowerCase().includes(filter);
+  });
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {console.log("return")}
+      <SearchBox onChangeHandler={onSearchChange} />
+      <CardList monsters={filteredMonsters}/>
     </div>
   );
 }
